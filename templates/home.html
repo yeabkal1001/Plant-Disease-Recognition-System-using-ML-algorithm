@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Plant Disease Recognition System - Identify plant diseases using advanced machine learning">
+    <meta name="theme-color" content="#667eea">
+    <title>Plant Disease Recognition System</title>
+    <link rel="icon" href="{{ url_for('static', filename='images/logo.svg') }}" type="image/svg+xml">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center" href="#" aria-label="Plant Disease Recognition Home">
+                <img src="{{ url_for('static', filename='images/logo.svg') }}" alt="Logo" width="32" height="32" class="me-2">
+                <span class="fw-bold">Plant Disease Recognition</span>
+            </a>
+        </div>
+    </nav>
+
+    <main class="main-container">
+        <section class="hero-section">
+            <div class="container">
+                <div class="row justify-content-center">
+                    <div class="col-lg-10 col-xl-8">
+                        <header class="hero-content text-center mb-5">
+                            <h1 class="hero-title">🌱 Plant Disease Recognition System</h1>
+                            <p class="hero-subtitle">Upload an image of a plant leaf to identify diseases using advanced machine learning algorithms</p>
+                        </header>
+
+                        <div class="upload-card">
+                            <form action="/upload/" method="POST" enctype="multipart/form-data" id="uploadForm" class="upload-form">
+                                <div class="upload-area" id="uploadArea" role="region" aria-label="Upload area">
+                                    <div class="upload-icon" aria-hidden="true">📤</div>
+                                    <h2 class="upload-title">Upload Plant Leaf Image</h2>
+                                    <p class="upload-subtitle">Click to browse or drag and drop</p>
+                                    <input 
+                                        type="file" 
+                                        id="fileInput" 
+                                        name="img" 
+                                        accept="image/png, image/jpeg, image/jpg, image/gif, image/bmp" 
+                                        required 
+                                        class="file-input"
+                                        aria-label="Choose image file">
+                                    <div class="file-info" id="fileInfo" role="status" aria-live="polite"></div>
+                                </div>
+                                <button type="submit" class="btn-upload" id="submitBtn" aria-busy="false">
+                                    <span class="btn-text">Analyze Image</span>
+                                    <span class="btn-loader d-none" aria-hidden="true">⏳ Processing...</span>
+                                </button>
+                            </form>
+                        </div>
+
+                        {% if error %}
+                        <article class="alert alert-danger alert-dismissible fade show mt-4" role="alert">
+                            <strong>⚠️ Error:</strong> {{ error }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close alert"></button>
+                        </article>
+                        {% endif %}
+
+                        {% if result %}
+                        <section class="results-section mt-5">
+                            <!-- Prediction Result -->
+                            <article class="result-card">
+                                <header class="result-header">
+                                    <h2 class="result-title">🔍 Analysis Result</h2>
+                                </header>
+                                <div class="result-content">
+                                    <figure class="result-image-wrapper">
+                                        <img src="{{ imagepath }}" alt="Uploaded plant leaf image" class="result-image">
+                                        <figcaption class="sr-only">Uploaded image for analysis</figcaption>
+                                    </figure>
+                                    <div class="result-details">
+                                        <div class="disease-name">
+                                            <span class="disease-label">Disease Identified:</span>
+                                            <h3 class="disease-title">{{ prediction['name'] }}</h3>
+                                            {% if comparison and comparison.confidence_warning %}
+                                            <div class="alert alert-warning mt-3" role="alert">
+                                                <strong>⚠️ Warning:</strong> Low confidence prediction. The uploaded image may not be a plant leaf. Please verify the image shows a clear plant leaf.
+                                            </div>
+                                            {% endif %}
+                                        </div>
+                                        <div class="disease-info">
+                                            <section class="info-section">
+                                                <h4>📋 Cause</h4>
+                                                <p>{{ prediction['cause'] }}</p>
+                                            </section>
+                                            <section class="info-section">
+                                                <h4>💊 Treatment / Management</h4>
+                                                <p>{{ prediction['cure'] }}</p>
+                                            </section>
+                                        </div>
+                                    </div>
+                                </div>
+                            </article>
+
+                            <!-- Model Comparison Section -->
+                            {% if comparison and comparison.comparison_info %}
+                            <article class="comparison-card mt-4">
+                                <header class="comparison-header">
+                                    <h2 class="comparison-title">🤖 Machine Learning Algorithm Comparison</h2>
+                                    <p class="comparison-subtitle">Performance analysis of the two ML algorithms used in this system</p>
+                                </header>
+
+                                <!-- Prediction Comparison -->
+                                {% if comparison.model_1 and comparison.model_2 %}
+                                <section class="prediction-comparison-section mt-4">
+                                    <h3 class="section-title">🔬 Prediction Comparison (This Image)</h3>
+                                    <div class="table-responsive">
+                                        <table class="table comparison-table" role="grid" aria-label="Algorithm prediction comparison">
+                                            <thead>
+                                                <tr>
+                                                    <th scope="col">Algorithm</th>
+                                                    <th scope="col">Prediction</th>
+                                                    <th scope="col">Confidence</th>
+                                                    <th scope="col">Status</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr class="{% if comparison.best_model == 'model_1' %}best-prediction{% endif %}">
+                                                    <td><strong>{{ comparison.model_1.name }}</strong></td>
+                                                    <td>{{ comparison.model_1.prediction.name }}</td>
+                                                    <td>
+                                                        <span class="confidence-badge" title="Confidence level">{{ comparison.model_1.confidence }}</span>
+                                                    </td>
+                                                    <td>
+                                                        {% if comparison.best_model == 'model_1' %}
+                                                        <span class="badge-best-pred" aria-label="Best prediction">⭐ Best</span>
+                                                        {% else %}
+                                                        <span class="text-muted">—</span>
+                                                        {% endif %}
+                                                    </td>
+                                                </tr>
+                                                <tr class="{% if comparison.best_model == 'model_2' %}best-prediction{% endif %}">
+                                                    <td><strong>{{ comparison.model_2.name }}</strong></td>
+                                                    <td>{{ comparison.model_2.prediction.name }}</td>
+                                                    <td>
+                                                        <span class="confidence-badge" title="Confidence level">{{ comparison.model_2.confidence }}</span>
+                                                    </td>
+                                                    <td>
+                                                        {% if comparison.best_model == 'model_2' %}
+                                                        <span class="badge-best-pred" aria-label="Best prediction">⭐ Best</span>
+                                                        {% else %}
+                                                        <span class="text-muted">—</span>
+                                                        {% endif %}
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </section>
+                                {% endif %}
+
+                                <footer class="comparison-footer">
+                                    <p class="info-text">
+                                        <strong>ℹ️ Note:</strong> The system uses both algorithms for prediction and selects the result with the highest confidence score. The overall performance metrics show how each algorithm performed on the training dataset.
+                                    </p>
+                                </footer>
+                            </article>
+                            {% endif %}
+                        </section>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container text-center">
+            <p class="footer-text">🌿 Plant Disease Recognition System - Powered by Machine Learning | © 2025</p>
+        </div>
+    </footer>
+
+    <script src="{{ url_for('static', filename='js/bootstrap.bundle.min.js') }}" defer></script>
+    <script defer>
+        const fileInput = document.getElementById('fileInput');
+        const fileInfo = document.getElementById('fileInfo');
+        const uploadArea = document.getElementById('uploadArea');
+        const uploadForm = document.getElementById('uploadForm');
+        const submitBtn = document.getElementById('submitBtn');
+        const MAX_FILE_SIZE = 16 * 1024 * 1024;
+
+        fileInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                if (file.size > MAX_FILE_SIZE) {
+                    fileInfo.innerHTML = `<strong style="color: #dc3545;">❌ File too large:</strong> Maximum size is 16 MB`;
+                    fileInput.value = '';
+                    uploadArea.classList.remove('has-file');
+                    return;
+                }
+                fileInfo.innerHTML = `<strong>✓ Selected:</strong> ${file.name} (${(file.size / 1024).toFixed(2)} KB)`;
+                fileInfo.style.display = 'block';
+                uploadArea.classList.add('has-file');
+            }
+        });
+
+        uploadForm.addEventListener('submit', function(e) {
+            if (!fileInput.files[0]) {
+                e.preventDefault();
+                alert('Please select an image file');
+                return;
+            }
+            submitBtn.disabled = true;
+            submitBtn.setAttribute('aria-busy', 'true');
+            submitBtn.querySelector('.btn-text').classList.add('d-none');
+            submitBtn.querySelector('.btn-loader').classList.remove('d-none');
+        });
+
+        // Drag and drop
+        uploadArea.addEventListener('dragover', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            uploadArea.classList.add('drag-over');
+        });
+
+        uploadArea.addEventListener('dragleave', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            uploadArea.classList.remove('drag-over');
+        });
+
+        uploadArea.addEventListener('drop', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            uploadArea.classList.remove('drag-over');
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                fileInput.files = files;
+                fileInput.dispatchEvent(new Event('change'));
+            }
+        });
+
+        uploadArea.addEventListener('click', function() {
+            fileInput.click();
+        });
+    </script>
+</body>
+</html>

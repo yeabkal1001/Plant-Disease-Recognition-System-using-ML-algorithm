@@ -1,0 +1,16 @@
+{
+  "algorithm_1_random_forest": {
+    "name": "Random Forest",
+    "train_accuracy": 1.0,
+    "test_accuracy": 0.24358974358974358,
+    "type": "random_forest"
+  },
+  "algorithm_2_gradient_boosting": {
+    "name": "Gradient Boosting",
+    "train_accuracy": 0.9967948717948718,
+    "test_accuracy": 0.23076923076923078,
+    "type": "gradient_boosting"
+  },
+  "best_model": "algorithm_1_random_forest",
+  "best_model_name": "Random Forest"
+}

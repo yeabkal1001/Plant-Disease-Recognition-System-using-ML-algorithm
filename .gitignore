@@ -1,0 +1,62 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+*.dll
+*.egg-info/
+.pytest_cache/
+.coverage
+.tox/
+.mypy_cache/
+
+# Env/config
+.python-version
+.env
+.env.*
+
+# Virtual envs
+.venv/
+venv/
+ENV/
+
+# VS Code
+.vscode/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# OS
+.DS_Store
+Thumbs.db
+.idea/
+.fleet/
+
+# Build/output
+build/
+dist/
+
+# Checkpoints and weights
+*.pth
+*.pt
+*.ckpt
+*.h5
+*.hdf5
+
+# App/runtime
+uploadimages/
+
+# Models and large artifacts
+models/*.pkl
+models/*_best.pkl
+models/*.onnx
+models/*.keras
+
+# Datasets (keep locally, don’t commit)
+Plant_leave_diseases_dataset_with_augmentation/
+
+# Logs and caches
+*.log
+*.tmp
+*.cache/
