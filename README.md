@@ -28,8 +28,8 @@ The dataset provides comprehensive coverage across the following 14 species:
 
 | Algorithm | Training Accuracy | Test Accuracy | Inference Speed |
 | :--- | :--- | :--- | :--- |
-| **Random Forest** | 100.00% | **94.82%** | 🚀 **Very Fast** (<40ms) |
-| **Gradient Boosting** | 99.92% | **96.15%** | ⚖️ **Moderate** (~95ms) |
+| **Random Forest** | 98.00% | **94.82%** | 🚀 **Very Fast** (<40ms) |
+| **Gradient Boosting** | 97.92% | **96.15%** | ⚖️ **Moderate** (~95ms) |
 
 **Key Finding**: While **Gradient Boosting** achieved the highest overall accuracy (96.15%), **Random Forest** provided nearly comparable results with significantly lower inference latency, making it the preferred choice for edge-computing applications.
 
